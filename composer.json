@@ -1,0 +1,21 @@
+{
+    "name": "kaikaige/yii2-dq",
+    "description": "云机汇dq扩展",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension"],
+    "license": "BSD-4-Clause",
+    "authors": [
+        {
+            "name": "kai.gao",
+            "email": "396929174@qq.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "kaikaige\\dq\\": ""
+        }
+    }
+}
