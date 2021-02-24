@@ -31,17 +31,9 @@ use backend\models\UserAdmin;
             'options'=>['tag'=>false],
         ]
     ]); ?>
-    <?php if(!$model->name) {?>
-        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-    <?php } else { ?>
-        <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'disabled' => true]) ?>
-    <?php } ?>
+    <?= $form->field($model, 'topic')->hiddenInput()->label(false) ?>
 
-    <?= $form->field($model, 'delay')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'des')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'ttr')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'body')->textarea(['rows'=>'5']) ?>
 
     <div class="layui-form-item text-right">
         <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>

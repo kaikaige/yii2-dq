@@ -40,9 +40,10 @@ class CreateForm extends \yii\base\Model
      */
     public function run($dq)
     {
-        $data = $dq->topicCreate($this->attributes);
-        if ($data['code'] == 200) {
-            return ['code'=>0, 'msg'=>$data['errMsg']];
+        $res = $dq->topicCreate($this->attributes);
+        if ($res->isOk) {
+            return ['code'=>0, 'msg'=>'添加成功'];
         }
+        return ['code'=>1, 'msg'=>$res->getContent()];
     }
 }

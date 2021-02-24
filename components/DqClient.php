@@ -5,6 +5,7 @@ namespace kaikaige\dq\components;
 use yii\base\Component;
 use yii\db\Exception;
 use yii\httpclient\Client;
+use yii\httpclient\Response;
 
 class DqClient extends Component
 {
@@ -29,25 +30,39 @@ class DqClient extends Component
 
     public function topicList()
     {
-        $res = $this->httpClient->get('topics')->send();
-        return $res->getData();
+        return $this->httpClient->get('topics')->send();
     }
 
+    /**
+     * @param $data
+     * @date 2021/2/24 4:53 下午
+     * @author gaokai
+     * @return Response
+     * @modified_date 2021/2/24 4:53 下午
+     * @modified_user gaokai
+     */
     public function topicCreate($data)
     {
         return $this->httpClient
             ->post('topic')
             ->setData($data)
-            ->send()
-            ->getData();
+            ->send();
     }
 
+    /**
+     * @param $topicName
+     * @date 2021/2/24 4:52 下午
+     * @author gaokai
+     * @return \yii\httpclient\Response
+     * @modified_date 2021/2/24 4:52 下午
+     * @modified_user gaokai
+     * @throws \yii\httpclient\Exception
+     */
     public function topicView($topicName)
     {
         return $this->httpClient
             ->get('topic/' . $topicName)
-            ->send()
-            ->getData();
+            ->send();
     }
 
     public function topicUpdate($data)
@@ -63,14 +78,54 @@ class DqClient extends Component
             ->getData();
     }
 
-    public function jobPush()
+    /**
+     * @des push job
+     * @param $topic
+     * @param $body
+     * @date 2021/2/24 6:43 下午
+     * @author gaokai
+     * @return Response
+     * @modified_date 2021/2/24 6:43 下午
+     * @modified_user gaokai
+     */
+    public function jobPush($topic, $body)
     {
-
+        return $this->httpClient
+            ->post('job')
+            ->setData(['topic'=>$topic, 'body'=>$body])
+            ->send();
     }
 
-    public function jobPop()
+    public function jobPop($topic, $handler)
     {
+        while (true) {
+            /**
+             * @var $res Response
+             */
+            $res = $this->httpClient
+                ->get('job')
+                ->setData(['topic' => $topic])
+                ->send();
+            switch ($res->statusCode) {
+                case 404:
+                    echo $res->getContent()."\n";
+                    sleep(1);
+                    break;
+                case 400:
+                    echo $res->getContent()."\n";
+                    break;
+                case 200:
+                    call_user_func($handler, $res);
+                    break;
+            }
+        }
+    }
 
+    public function jobFinish($topic, $jobId)
+    {
+        return $this->httpClient
+            ->delete('job?'.http_build_query(['topic'=>$topic, 'job_id'=>$jobId]))
+            ->send();
     }
 }
 

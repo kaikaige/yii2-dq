@@ -10,13 +10,14 @@ use yii\helpers\Url;
 </script>
 <!-- 表格操作列 -->
 <script type="text/html" id="sys-log-table-bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="job">job</a>
     <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <!-- 表头操作 -->
 <script type="text/html" id="sys-log-table-tool-bar">
-    <a class="layui-btn layui-btn-sm" lay-event="refresh"><i class="layui-icon layui-icon-refresh"></i></a>
-    <a class="layui-btn layui-btn-sm" lay-event="create"><i class="layui-icon layui-icon-edit"></i></a>
+    <a class="layui-btn layui-btn-sm" lay-event="refresh"><i class="layui-icon layui-icon-refresh"></i>刷新</a>
+    <a class="layui-btn layui-btn-sm" lay-event="create">添加Topic</a></i></a>
 </script>
 <script>
     layui.use(['layer', 'form', 'table','tableX', 'laydate'], function () {
@@ -36,10 +37,10 @@ use yii\helpers\Url;
             url: '<?=Url::to(["index"])?>',
             toolbar: '#sys-log-table-tool-bar',
             method:'get',
-            limit:20,
+            limit:10000,
             defaultToolbar: ['filter'],
             where:{'init_data':'get-request'}, //用于判断是否为get的请求
-            page: true,
+            page: false,
             cellMinWidth: 100,
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
@@ -49,7 +50,7 @@ use yii\helpers\Url;
                 {field:'des', align: 'center', title:'备注', sort: true, edit:'text'},
                 {field:'list_length', align: 'center', title:'队列阻塞', sort: true},
                 {field:'bucket_length', align: 'center', title:'未消费', sort: true},
-                {fixed: 'right',align: 'center', toolbar: '#sys-log-table-bar', title: '操作', minWidth: 170}
+                {fixed: 'right',align: 'center', toolbar: '#sys-log-table-bar', title: '操作', minWidth: 270}
             ]]
         });
 
@@ -62,8 +63,8 @@ use yii\helpers\Url;
                 showEditModel(data)
             } else if (layEvent === 'del') { //删除
                 delModel(data,obj);
-            } else if (layEvent === 'details'){
-                viewModel(data);
+            } else if (layEvent === 'job'){ //添加job
+                pushJobModel(data);
             }
         });
 
@@ -130,8 +131,7 @@ use yii\helpers\Url;
 
         //修改and添加
         function showEditModel(data) {
-            admin.putTempData('t-sys-log-form-ok', false);
-
+            admin.putTempData('t-ok', false);
             top.layui.admin.open({
                 type: 2,
                 title: data ? '修改Topic' : '添加topic',
@@ -140,8 +140,23 @@ use yii\helpers\Url;
                 area: ['50%', '70%'],
                 content: data ? '<?=Url::to(['update'])?>?id='+data.name : '<?= Url::to(['create'])?>',
                 end: function () {
-                    admin.getTempData('t-sys-log-form-ok');
-                    table.reload('sys-log-table');  // 成功刷新表格
+                    admin.getTempData('t-ok') && table.reload('sys-log-table');  // 成功刷新表格
+                }
+            });
+        }
+
+        //修改and添加
+        function pushJobModel(data) {
+            admin.putTempData('t-ok', false);
+            top.layui.admin.open({
+                type: 2,
+                title: '添加job',
+                maxmin: true,
+                resize: true,
+                area: ['50%', '70%'],
+                content: '<?=Url::to(['push-job'])?>?id='+data.name,
+                end: function () {
+                    admin.getTempData('t-ok') && table.reload('sys-log-table');  // 成功刷新表格
                 }
             });
         }
